@@ -1,0 +1,30 @@
+Package validation report
+=========================
+
+Safe automated tests:
+  32 passed
+  5 skipped
+  0 failed
+
+Expected skips:
+  - 1 live SMTP test (requires ALLOW_LIVE_EMAIL_TEST=1)
+  - 2 primary checkpoint tests (original best.pt/last.pt not supplied to packager)
+  - 2 ROI checkpoint tests (original roi_best.pt/roi_last.pt not supplied to packager)
+
+Additional checks:
+  - Python compileall: passed
+  - JavaScript syntax check for static/js/camera.js: passed
+  - Training CSV analysis: passed (15 epochs; best mAP50-95 at epoch 15)
+  - Manual tools path/import bootstrapping: added
+  - Manual ROI without secondary model: fixed and regression-tested
+
+Runtime requirements not tested in the packaging environment:
+  - Ultralytics/PyTorch model inference
+  - Actual model checkpoint loading
+  - Physical webcam
+  - Live SMTP delivery
+
+Add the original .pt files to Models/, install requirements, and run:
+  python final_verification.py
+  pytest -q
+  python app.py

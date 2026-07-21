@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Intrusion Monitor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header><div><h1>Live Intrusion Monitor</h1><div>Server-side camera feed with intrusion-first ROI checking and fuzzy class-based alert rules</div></div></header>
+<main>
+  <section class="panel">
+    <img id="cameraFeed" alt="Camera feed will appear after you start the camera">
+  </section>
+  <aside class="panel">
+    <div class="buttons">
+      <button id="startButton">Start Camera</button>
+      <button id="stopButton" disabled>Stop Camera</button>
+    </div>
+    <label><input id="flipCamera" type="checkbox"> Mirror the camera image</label>
+    <div id="status" class="status">Camera stopped</div>
+    <div class="metric"><span>Detections</span><strong id="detectionCount">0</strong></div>
+    <div class="metric"><span>Final status</span><strong id="finalStatus">—</strong></div>
+    <div class="metric"><span>Risk score</span><strong id="riskScore">0</strong></div>
+    <div class="metric"><span>ROI model detections</span><strong id="roiDetectionCount">0</strong></div>
+    <div class="metric"><span>Inside ROI</span><strong id="insideRoiCount">0</strong></div>
+    <div class="metric"><span>Fuzzy class</span><strong id="fuzzyClass">—</strong></div>
+    <div class="metric"><span>Fuzzy score</span><strong id="fuzzyScore">0</strong></div>
+    <div id="detectionList"><p class="muted">No detections yet.</p></div>
+    <a class="back" href="{{ url_for('home') }}">Back to Home</a>
+  </aside>
+</main>
+<script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+</body>
+</html>

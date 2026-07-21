@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intrusion Detection Result</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header><div><h1>Detection Result</h1></div></header>
+<main>
+  {% set current_status = decision.status if decision else (summary.final_status if summary else 'non_intrusion') %}
+  <section class="status {{ current_status }}">
+    <h2>{{ 'Intrusion Detected' if current_status == 'intrusion' else 'No Intrusion Detected' }}</h2>
+    <div>{{ decision.reason if decision else 'Processing completed.' }}</div>
+  </section>
+
+  <section class="panel">
+    {% if kind == 'image' %}
+      <img src="/{{ output_path }}" alt="Annotated intrusion and ROI detection result">
+    {% else %}
+      <video controls preload="metadata"><source src="/{{ output_path }}" type="video/mp4">Your browser cannot play this video.</video>
+    {% endif %}
+  </section>
+
+  {% if kind == 'image' %}
+  <section class="panel">
+    <h2>Decision Summary</h2>
+    <div class="grid">
+      <div class="metric"><span>Status</span><strong>{{ decision.status|replace('_',' ')|title }}</strong></div>
+      <div class="metric"><span>Alert</span><strong>{{ 'Yes' if decision.should_alert else 'No' }}</strong></div>
+      <div class="metric"><span>Risk</span><strong>{{ '%.1f'|format(decision.risk_score) }}/100</strong></div>
+      <div class="metric"><span>Intrusion detections</span><strong>{{ detections|length }}</strong></div>
+      <div class="metric"><span>ROI model detections</span><strong>{{ roi_summary.roi_model_detection_count if roi_summary else 0 }}</strong></div>
+      <div class="metric"><span>Inside ROI</span><strong>{{ roi_summary.inside_roi_count if roi_summary else 0 }}</strong></div>
+      <div class="metric"><span>Fuzzy class</span><strong>{{ decision.fuzzy_result.fuzzy_class if decision and decision.fuzzy_result else '—' }}</strong></div>
+      <div class="metric"><span>Fuzzy score</span><strong>{{ '%.1f'|format(decision.fuzzy_result.fuzzy_score) if decision and decision.fuzzy_result else '0.0' }}/100</strong></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>ROI Summary</h2>
+    {% if roi_summary %}
+      <div class="grid">
+        <div class="metric"><span>ROI loaded</span><strong>{{ 'Yes' if roi_summary.roi_model_loaded else 'No' }}</strong></div>
+        <div class="metric"><span>Manual zones</span><strong>{{ roi_summary.manual_zone_count or 0 }}</strong></div>
+        <div class="metric"><span>Model zones</span><strong>{{ roi_summary.model_zone_count or 0 }}</strong></div>
+        <div class="metric"><span>ROI required</span><strong>{{ 'Yes' if roi_summary.require_roi_for_alert else 'No' }}</strong></div>
+        <div class="metric"><span>Fuzzy-ready detections</span><strong>{{ roi_summary.fuzzy_ready_count or 0 }}</strong></div>
+      </div>
+    {% else %}
+      <p class="empty">ROI monitoring was not available for this result.</p>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <h2>Intrusion Detections</h2>
+    {% if detections %}
+    <table>
+      <thead><tr><th>Class</th><th>Confidence</th><th>Area</th><th>ROI status</th><th>ROI context</th><th>Fuzzy</th><th>Box</th></tr></thead>
+      <tbody>
+      {% for item in detections %}
+        <tr>
+          <td>{{ item.model_class }}</td>
+          <td>{{ '%.1f%%'|format(item.confidence * 100) }}</td>
+          <td>{{ '%.2f%%'|format(item.area_percent) }}</td>
+          <td>{{ item.roi_status or 'not checked' }}{% if item.roi_zone_name %}<br><span class="badge">{{ item.roi_zone_name }}</span>{% endif %}</td>
+          <td>{{ item.roi_context_class or '—' }}</td>
+          <td>{% if item.fuzzy_class %}{{ item.fuzzy_class }}<br><span class="badge">{{ item.fuzzy_score }}/100</span>{% else %}—{% endif %}</td>
+          <td>{{ item.bbox }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="empty">The model returned no valid intrusion detections.</p>{% endif %}
+  </section>
+  {% else %}
+  <section class="panel">
+    <h2>Video Summary</h2>
+    <div class="grid">
+      <div class="metric"><span>Total frames</span><strong>{{ summary.frames_total }}</strong></div>
+      <div class="metric"><span>Processed frames</span><strong>{{ summary.frames_processed }}</strong></div>
+      <div class="metric"><span>Intrusion detections</span><strong>{{ summary.total_detections }}</strong></div>
+      <div class="metric"><span>Intrusion frames</span><strong>{{ summary.intrusion_frames }}</strong></div>
+      <div class="metric"><span>Inside ROI frames</span><strong>{{ summary.inside_roi_frames }}</strong></div>
+      <div class="metric"><span>ROI model detections</span><strong>{{ summary.roi_model_detections }}</strong></div>
+      <div class="metric"><span>Last fuzzy class</span><strong>{{ summary.last_decision.fuzzy_result.fuzzy_class if summary.last_decision and summary.last_decision.fuzzy_result else '—' }}</strong></div>
+      <div class="metric"><span>Highest confidence</span><strong>{{ '%.1f%%'|format(summary.highest_confidence * 100) }}</strong></div>
+      <div class="metric"><span>Highest risk</span><strong>{{ '%.1f'|format(summary.highest_risk_score) }}</strong></div>
+    </div>
+  </section>
+  {% endif %}
+
+  <a class="button" href="{{ url_for('home') }}">Check Another File</a>
+</main>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hybrid Intrusion Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Hybrid Intrusion Detection System</h1>
+    <p>Security dashboard for image, video, and live-camera monitoring. The system first detects intrusion, then checks whether the detected bounding box enters the restricted ROI zone, and finally uses fuzzy logic for the alert decision.</p>
+  </div>
+</header>
+<main>
+  <div class="notice">
+    <strong>Model behaviour:</strong> the supplied model has one trained class: <b>intrusion</b>. A scene is shown as <b>non-intrusion</b> when no valid intrusion detection meets the decision rules.
+  </div>
+
+  <div class="notice">
+    <strong>ROI + fuzzy workflow:</strong> intrusion detection runs first. If intrusion is found, the bounding box is checked against the restricted ROI area. If it enters the ROI, fuzzy logic evaluates classes such as <b>abnormal person</b>, <b>covered person</b>, <b>normal person</b>, <b>weapon</b>, or <b>background</b>.
+  </div>
+
+  <section class="grid">
+    <article class="card">
+      <h2>Image Detection</h2>
+      <p>Upload a CCTV image. The result page shows intrusion status, restricted ROI checking, fuzzy class, risk score, and final alert decision.</p>
+      <form action="{{ url_for('detect_image') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*" required>
+        <button type="submit">Check Image</button>
+      </form>
+    </article>
+
+    <article class="card">
+      <h2>Video Detection</h2>
+      <p>Upload a CCTV video. The system checks intrusion frame by frame, validates ROI entry, applies fuzzy logic, and creates an annotated output video.</p>
+      <form action="{{ url_for('detect_video') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="video/*" required>
+        <button type="submit">Check Video</button>
+      </form>
+    </article>
+
+    <article class="card">
+      <h2>Live Camera</h2>
+      <p>Monitor a live camera connected to this computer. The dashboard shows intrusion status, ROI entry, fuzzy class, and risk score in real time.</p>
+      <a class="button" href="{{ url_for('live_camera_page') }}">Open Live Monitor</a>
+    </article>
+  </section>
+
+  <section class="model">
+    <strong>Primary intrusion model:</strong> {{ model_info.model_path }}<br>
+    <strong>Task:</strong> {{ model_info.task }} &nbsp; | &nbsp;
+    <strong>Classes:</strong> {{ model_info.classes|join(', ') }} &nbsp; | &nbsp;
+    <strong>Device:</strong> {{ model_info.device }}
+    <hr>
+    <strong>ROI model:</strong>
+    {% if roi_model_info %}
+      {{ roi_model_info.model_path }}<br>
+      <strong>ROI classes:</strong> {{ roi_model_info.classes|join(', ') }} &nbsp; | &nbsp;
+      <strong>ROI task:</strong> {{ roi_model_info.task }}
+    {% elif roi_enabled %}
+      Enabled in configuration, but ROI model was not loaded. Check ROI_MODEL_PATH.
+    {% else %}
+      Disabled.
+    {% endif %}
+  </section>
+</main>
+<footer>Hybrid Intrusion Detection with ROI and Fuzzy Logic — Homes and Retail Shops</footer>
+</body>
+</html>

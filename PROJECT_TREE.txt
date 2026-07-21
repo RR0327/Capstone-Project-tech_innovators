@@ -1,0 +1,89 @@
+Intrusion-Detection-WSB-CCTV-ROI-Fuzzy-Final/
+├── Documentation/
+│   ├── DETECTION_FIX_SUMMARY.md
+│   ├── explanation.md
+│   ├── FINAL_COMPLETION_REPORT.md
+│   ├── FRONTEND_THEME_UPDATE.md
+│   ├── GMAIL_BODY_UPDATE_REPORT.md
+│   ├── MIGRATION_NOTES.md
+│   ├── OPTIMIZATION_GUIDE.md
+│   ├── PROJECT_DEFENCE_REPORT.md
+│   ├── QUICK_START_OPTIMIZATIONS.md
+│   ├── ROI_FUZZY_MODIFICATION_REPORT.md
+│   ├── ROI_INTEGRATION_REPORT.md
+│   ├── system_design.md
+│   └── workflow.md
+├── Models/
+│   ├── .gitkeep
+│   └── README.md
+├── services/
+│   ├── __init__.py
+│   ├── alert_decision_logic.py
+│   ├── alert_service.py
+│   ├── camera_utils.py
+│   ├── detector.py
+│   ├── feature_extractor.py
+│   ├── fuzzy_logic.py
+│   ├── risk_utils.py
+│   ├── roi_detector.py
+│   ├── roi_utils.py
+│   ├── tracker.py
+│   └── video_utils.py
+├── static/
+│   ├── alerts/
+│   │   └── .gitkeep
+│   ├── css/
+│   │   └── style.css
+│   ├── js/
+│   │   └── camera.js
+│   ├── results/
+│   │   └── .gitkeep
+│   └── uploads/
+│       └── .gitkeep
+├── templates/
+│   ├── index.html
+│   ├── live_camera.html
+│   └── result.html
+├── tests/
+│   ├── conftest.py
+│   ├── test_alert_system.py
+│   ├── test_camera_pipeline.py
+│   ├── test_conf_threshold.py
+│   ├── test_config_consistency.py
+│   ├── test_detection_fix.py
+│   ├── test_email.py
+│   ├── test_email_config.py
+│   ├── test_email_trigger.py
+│   ├── test_full_system.py
+│   ├── test_fuzzy_logic.py
+│   ├── test_highest_confidence.py
+│   ├── test_image_alert.py
+│   ├── test_intrusion_logic.py
+│   ├── test_models.py
+│   ├── test_professional_email_body.py
+│   ├── test_roi_logic.py
+│   └── test_roi_models.py
+├── tools/
+│   ├── __init__.py
+│   ├── debug_detector.py
+│   ├── debug_yolo.py
+│   ├── email_trigger_control.py
+│   ├── test_email_setup.py
+│   ├── test_recent_img.py
+│   ├── test_threshold_comparison.py
+│   └── verify_fix.py
+├── training/
+│   ├── args.yaml
+│   ├── data.example.yaml
+│   └── results.csv
+├── .env.example
+├── .env.template
+├── .gitignore
+├── app.py
+├── final_verification.py
+├── MODEL_ACCURACY_ANALYSIS.py
+├── OPTIMIZATION_CONFIG.py
+├── PACKAGE_NOTES.md
+├── pytest.ini
+├── README.md
+└── requirements.txt
