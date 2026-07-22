@@ -13,7 +13,7 @@ try:
 except Exception:  # pragma: no cover - handled when detector is constructed
     YOLO = None
 
-
+# Class Definitions and Initialization
 class IntrusionDetector:
     """
     Detects the trained class ``intrusion``.
@@ -27,7 +27,7 @@ class IntrusionDetector:
         self,
         model_path: str | None = None,
         conf: float = 0.25,
-        iou: float = 0.40,
+        iou: float = 0.40,            # Intersection over Union (IoU) threshold for NMS (Non-Max Suppression)
         opacity: float = 0.95,
         adaptive_preprocessing: bool = False,
         max_det: int = 100,
@@ -49,8 +49,10 @@ class IntrusionDetector:
         self.device = 0 if self._cuda_available() else "cpu"
         self.names = self.model.names
 
+# Contrast Limited Adaptive Histogram Equalization (CLAHE)
         self.clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
 
+# Static Methods
     @staticmethod
     def _cuda_available() -> bool:
         try:
@@ -60,6 +62,7 @@ class IntrusionDetector:
         except Exception:
             return False
 
+# Model Information
     def model_info(self) -> dict[str, Any]:
         names = self.names
         if isinstance(names, dict):
@@ -75,6 +78,9 @@ class IntrusionDetector:
             "confidence_threshold": self.conf,
             "iou_threshold": self.iou,
         }
+    
+# Frame Processing
+# => Estimates the brightness of a frame by converting it to grayscale and calculating the mean pixel intensity.
 
     @staticmethod
     def _estimate_brightness(frame: np.ndarray) -> float:
@@ -101,6 +107,11 @@ class IntrusionDetector:
             cv2.merge((lightness, a_channel, b_channel)), cv2.COLOR_LAB2BGR
         )
 
+# LAB2BGR =>
+# L (lightness/brightness), a (green-to-red color spectrum), and b (blue-to-yellow color spectrum).
+# BGR (Blue, Green, Red)
+
+# Prediction Methods
     def _predict(self, frame: np.ndarray):
         prepared = self._preprocess_frame(frame)
         return self.model.predict(
@@ -138,6 +149,7 @@ class IntrusionDetector:
         detections = self._extract_detections(result, frame_bgr.shape)
         return self.draw_detections(frame_bgr, detections), detections
 
+# Detection Extraction
     def _class_name(self, class_id: int, result: Any) -> str:
         names = getattr(result, "names", None) or self.names
         if isinstance(names, dict):
@@ -219,6 +231,7 @@ class IntrusionDetector:
             )
         return detections
 
+# Drawing Detections
     @staticmethod
     def draw_detections(
         frame: np.ndarray, detections: list[dict[str, Any]]
@@ -263,4 +276,4 @@ class IntrusionDetector:
 
 
 # Kept only so old imports do not crash while the project is migrated.
-FireDetector = IntrusionDetector
+# FireDetector = IntrusionDetector

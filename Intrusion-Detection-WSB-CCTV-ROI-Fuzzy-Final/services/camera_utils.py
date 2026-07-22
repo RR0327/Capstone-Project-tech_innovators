@@ -16,7 +16,7 @@ from services.risk_utils import RiskCalculator
 from services.roi_utils import ROIAnalyzer
 from services.tracker import CentroidTracker
 
-
+# Class Definition and initialization
 class CameraStream:
     def __init__(
         self,
@@ -67,6 +67,7 @@ class CameraStream:
             "roi_summary": {"enabled": bool(self.roi_detector and self.roi_analyzer)},
         }
 
+# Start and stop methods for the camera stream
     def start(self) -> None:
         if self.running:
             return
@@ -80,6 +81,7 @@ class CameraStream:
             self.thread.join(timeout=2.0)
         self.camera.release()
 
+# Internal methods for processing frames and running ROI analysis / ROI Processing
     def _run_roi(self, frame, detections: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, Any], list[dict[str, Any]]]:
         if not self.roi_analyzer:
             return detections, {"enabled": False}, []
@@ -91,14 +93,20 @@ class CameraStream:
         summary["roi_model_loaded"] = self.roi_detector is not None
         return analyzed, summary, roi_detections
 
+# Frame Processing
     def _process_frames(self) -> None:
         while self.running and self.camera.isOpened():
             success, frame = self.camera.read()
             if not success:
-                time.sleep(0.05)
+                time.sleep(0.05)    # Wait a bit before retrying to avoid busy looping if the camera fails to provide frames.
                 continue
             if self.use_flipped_camera:
                 frame = cv2.flip(frame, 1)
+
+# time.sleep(0.05)    # Optional: Add a small delay to reduce CPU usage if needed. 
+# 0.05 seconds is a reasonable compromise between responsiveness and CPU load.
+# 0.05 seconds equal to 20 frames per second, which is often sufficient for real-time processing in many applications.
+# 0.05 seconds equals to 50 milliseconds, which is a common frame interval for video processing. Adjust as necessary based on your specific requirements and performance testing.
 
             self.frame_count += 1
             if self.frame_count % self.frame_skip != 0:
@@ -106,6 +114,7 @@ class CameraStream:
                     self.latest_frame = frame
                 continue
 
+# Detection and Alert Logic
             try:
                 annotated, detections = self.detector.predict_frame(frame)
                 enriched = self.feature_extractor.extract_features(detections, frame.shape)
@@ -133,7 +142,7 @@ class CameraStream:
                             1,
                             cv2.LINE_AA,
                         )
-
+# Risk Calculation and Alert Decision
                 best_detection, risk_info = self.risk_calculator.select_most_dangerous(
                     enriched, tracked_objects, frame.shape
                 )
@@ -170,7 +179,7 @@ class CameraStream:
                     "status": decision["status"],
                     "decision": decision,
                 }
-
+# Sending Alert
                 if decision.get("should_alert") and self.alert_service:
                     now = time.time()
                     if now - self.last_alert_time >= self.cooldown_seconds:
@@ -204,6 +213,7 @@ class CameraStream:
                 with self.frame_lock:
                     self.latest_frame = frame
 
+# Frame Retrieval and Encoding
     def get_frame(self):
         with self.frame_lock:
             return None if self.latest_frame is None else self.latest_frame.copy()
@@ -217,5 +227,7 @@ class CameraStream:
             raise RuntimeError("Could not encode camera frame.")
         return buffer.tobytes()
 
+# Get Detections Information
     def get_detections(self) -> dict[str, Any]:
         return self.detection_info
+    

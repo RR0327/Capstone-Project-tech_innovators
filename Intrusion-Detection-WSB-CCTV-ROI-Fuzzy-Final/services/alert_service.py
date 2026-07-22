@@ -17,11 +17,11 @@ import cv2
 
 class AlertService:
     MODES = {
-        "ALWAYS": 0,
-        "COOLDOWN_60": 60,
-        "COOLDOWN_300": 300,
-        "COOLDOWN_3600": 3600,
-        "MANUAL": float("inf"),
+        "ALWAYS": 0,                      # email sent every single time
+        "COOLDOWN_60": 60,               # email sent at most once per minute
+        "COOLDOWN_300": 300,             # email sent at most once per 5 minutes
+        "COOLDOWN_3600": 3600,          # email sent at most once per hour
+        "MANUAL": float("inf"),          # email sent only when manually triggered
     }
 
     def __init__(self) -> None:
